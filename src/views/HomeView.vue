@@ -14,7 +14,7 @@
         <div class="col">
           <div class="input-group mb-3">
             <span class="input-group-text" id="addon-wrapping">帳號</span>
-            <input type="text" class="form-control" v-model="account" placeholder="username" aria-label="username" aria-describedby="basic-addon2">
+            <input type="text" class="form-control"  v-model="account" placeholder="username" aria-label="username" aria-describedby="basic-addon2">
             <!-- <span class="input-group-text" id="basic-addon2">@gmail.com</span> -->
           </div>
 
@@ -22,7 +22,7 @@
 
           <div class="input-group flex-nowrap">
             <span class="input-group-text" id="addon-wrapping">密碼</span>
-            <input type="password" class="form-control" v-model="Password" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping">
+            <input type="password"  class="form-control" v-model="Password" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping">
           </div>
 
           <div class="p-3 gap-3">
@@ -61,8 +61,8 @@ export default {
       msg:'',
       LoginAction:false,
       LoginSuccess:false,
-      account:'',
-      Password:''
+      account:'ray.10315332@gmail.com',
+      Password:'project-655122738317'
     }
   },
   methods:{
@@ -72,6 +72,8 @@ export default {
         "password": this.Password//     project-655122738317
       })
       .then((res)=>{
+        console.log(res)
+        this.saveConfig(res)
         this.LoginAction = true
         let JsonData = res.data
         if(JsonData.success){
@@ -102,6 +104,14 @@ export default {
         .catch((err) => {
           alert(err.response.data.message)
         })
+    },
+    saveConfig(token){
+       console.log(token)
+       localStorage.setItem("token",JSON.stringify({
+        "token":token.data.token,
+        "uid":token.data.uid,
+        "expired":token.data.expired
+       }))
     },
   }
 
