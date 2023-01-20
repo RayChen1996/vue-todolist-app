@@ -56,7 +56,7 @@
           <div class="col">
             <pagenation :page="pagination"
              :get-products="getProducts"
-
+             @chgPages="getProducts"
             />
           </div>
         </div>
