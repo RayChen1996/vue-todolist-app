@@ -46,8 +46,6 @@
 let BaseUrl = `https://vue3-course-api.hexschool.io/`
 import axios from 'axios';
 
- 
-
 export default {
   name: 'HomeView',
   props:{
@@ -72,7 +70,6 @@ export default {
         "password": this.Password//     project-655122738317
       })
       .then((res)=>{
-        console.log(res)
         this.saveConfig(res)
         this.LoginAction = true
         let JsonData = res.data
@@ -106,7 +103,6 @@ export default {
         })
     },
     saveConfig(token){
-       console.log(token)
        localStorage.setItem("token",JSON.stringify({
         "token":token.data.token,
         "uid":token.data.uid,

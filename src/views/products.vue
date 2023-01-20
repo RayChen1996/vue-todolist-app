@@ -1,9 +1,9 @@
 <template>
     <div>
-
+      
       <div class="container">
         <div class="text-end mt-4">
-          <button class="btn btn-primary"  data-bs-toggle="modal" data-bs-target="#productModal">
+          <button class="btn btn-primary"  data-bs-toggle="modal" @click="isNew=true" data-bs-target="#productModal">
             建立新的產品
           </button>
         </div>
@@ -43,7 +43,7 @@
                   <button type="button" class="btn btn-outline-primary btn-sm"  data-bs-toggle="modal" data-id="{{product.id}}" @click="SelectedEditId(product.id);isNew=false"  data-bs-target="#productModal"    >
                     編輯
                   </button>
-                  <button type="button" class="btn btn-outline-danger btn-sm" data-id="{{product.id}}"  data-bs-toggle="modal" @click="SelectedId(product.id)"  data-bs-target="#delProductModal"  >
+                  <button type="button" class="btn btn-outline-danger btn-sm" data-id="{{product.id}}"  data-bs-toggle="modal" @click="SelectedId(product.id);"  data-bs-target="#delProductModal"  >
                     刪除
                   </button>
                 </div>
@@ -51,9 +51,21 @@
             </tr>
           </tbody>
         </table>
+
+        <div class="row">
+          <div class="col">
+            <pagenation :page="pagination"
+             :get-products="getProducts"
+
+            />
+          </div>
+        </div>
+        
       </div>
 
 
+
+      
 
 
 
@@ -219,13 +231,14 @@ img {
 <script>
 let BaseUrl = `https://vue3-course-api.hexschool.io/`
 import axios from 'axios';
+import pagenation from '../components/PageBar.vue'
 export default {
   name: 'ProductsView',
   props:{
 
   },
   components: {
-     
+    pagenation,
   },
   data(){
     return{
@@ -252,16 +265,16 @@ export default {
       imageUrl3:'',
       imageUrl4:'',
       imageUrl5:'',
+      pagination: {},
      
     }
   },
   methods:{
     SelectedEditId(Id){
       this.EditIdx = Id
-      let tmp = this.products.filter((item)=>{
-        return Id  == item.id
-      })
-      console.log(tmp)
+      // let tmp = this.products.filter((item)=>{
+      //   return Id  == item.id
+      // })
     },
     SelectedId(Id){
       this.delIdx = Id
@@ -270,7 +283,7 @@ export default {
       const url = `${BaseUrl}/v2/api/user/check`;
       axios.post(url)
         .then(() => {
-            this.getProductsData() 
+            this.getProducts() 
         })
         .catch((err) => {
           alert(err.response.data.message)
@@ -279,19 +292,20 @@ export default {
     openModal(){
     //  this.EditProductModal.show();
     },
-    getProductsData() {
+    getProducts(page=1) {
       var Config = JSON.parse(localStorage.getItem("token"))
-
       const config = {
         headers: { Authorization: Config.token },
       };
-      const url = `${BaseUrl}/v2/api/${this.apiPath}/admin/products`;
-
+      // const url = `${BaseUrl}/v2/api/${this.apiPath}/admin/products`;
+      const url = `${BaseUrl}/v2/api/${this.apiPath}/admin/products?page=${page}`;
       axios.get(url,config)
         .then((response) => {
-          console.log(response.data)
+           console.log(response)
             if(response.data.success){
                 this.products = response.data.products;
+                this.pagination = response.data.pagination;
+                console.log(this.pagination)
             }
         })
         .catch((err) => {
@@ -299,16 +313,15 @@ export default {
           this.$router.push('/');
         })
     },
+    MakePagenation(){
+
+    },
     AddProduct(){
       var Config = JSON.parse(localStorage.getItem("token"))
-
       const config = {
         headers: { Authorization: Config.token },
       };
-      // console.log(config)
       const url = `${BaseUrl}v2/api/${this.apiPath}/admin/product`;
-      // console.log(url)
-      // console.log(this.title , this.category ,  this.origin_price ,this.price , this.is_enabled )
       axios.post(url,{
         "data":{
               title: this.title,
@@ -336,8 +349,7 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err.response.data.message);
-          // this.$router.push('/');
+          alert(err)
         })
     },
     modifyProduct(){
@@ -368,8 +380,7 @@ export default {
         }
       },config)
         .then((response) => {
-          console.log(response.data)
-     
+          console.log(response.data)     
         })
         .catch((err) => {
           alert(err.response.data.message);
@@ -384,13 +395,10 @@ export default {
       const url = `${BaseUrl}/v2/api/${this.apiPath}/admin/product/${this.delIdx}`;
       axios.delete(url,config)
         .then((response) => {
-          console.log(response.data)
             if(response.data.success){
                 this.products = response.data.products;
-
             }
-
-            this.getProductsData()
+            this.getProducts()
         })
         .catch((err) => {
           alert(err.response.data.message);
@@ -400,19 +408,11 @@ export default {
     expandProduct(item) {
       this.tempProduct = item;
     },
- 
   },
   mounted(){
-    this.checkIsManager()
-    // this.getProductsData()
-
+    this.getProducts() 
+    // this.checkIsManager()
     this.EditProductModal = document.getElementById('productModal');
-
-
-
-
-
-
 
   }
 
